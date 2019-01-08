@@ -1,2 +1,2 @@
-# Astro_inventory
-A generical astronomy data file inventory organizer 
+# Astro_data_index
+A generical astronomy data file indexing system
