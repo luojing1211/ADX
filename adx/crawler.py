@@ -39,7 +39,7 @@ class Crawler:
         self.recusive = recusive
         self.cur_location = dir_name
         self.cur_dir_info = ParserDir(self.cur_dir)
-        self.visited  = self.cur_location
+        self.visited = [self.cur_location,]
 
     def check_type(self, item, file_type_map={}, sign_lenght=32):
         """ Check item type
@@ -75,4 +75,4 @@ class Crawler:
             return file_type
 
     def crawl_dir(self, recusive=True):
-        pass 
+        pass
