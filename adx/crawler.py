@@ -6,7 +6,6 @@
 """
 
 import os
-from .parser import ParserDir
 
 
 class Crawler:
@@ -17,10 +16,8 @@ class Crawler:
         ---------
         dir_name : str
             Directory name
-        parser_template : dict
-            The template functions for parsing one type of files. The key is the
-            file type name and the value is the Parser subclass of the same file
-            type.
+        parsers : list
+            A list of `Pareser object` for each file type.
         recusive: bool, optional
             The flag that tells if the crawler to go through the subdirecotries.
             The default is 'True'.
@@ -29,9 +26,9 @@ class Crawler:
         ----
         Crawler only parses the file types that have parser_template provided.
     """
-    def __init__(self, dir_name, parser_template, recusive=True):
+    def __init__(self, dir_name, parsers, recusive=True):
         self.root_dir = dir_name
-        self.parser_template = parse_template
+        self.parsers = parses
         # If the parser_template does not include the customer defined parser,
         # it will add the default directory parser.
         if 'directory' not in self.parser_template:
@@ -40,39 +37,66 @@ class Crawler:
         self.cur_location = dir_name
         self.cur_dir_info = ParserDir(self.cur_dir)
         self.visited = [self.cur_location,]
+        self.set_up()
 
-    def check_type(self, item, file_type_map={}, sign_lenght=32):
-        """ Check item type
+    def set_up(self):
+        """ This function prepares the crawler. It does the following steps:
+        1. Gather the file types information for the parsers.
+        2. Build the extension map
+        ....
+        """
+        self.target_types = []
+        self.ext_map = {}
+        # get all the types and build the extension map.
+        for p in self.parsers:
+            self.target_types.append(p.file_type)
+            for ext in p.extensions:
+                if ext not in self.ext_map.keys():
+                    self.ext_map[ext] = [p,]
+                else:
+                    self.ext_map.append(p)
+
+    def _check_ext(self, item):
+        """ Check item's extension.
 
             Parameter
             ---------
             item : str
                 The full path to the item.
-            file_type_map: dict, optional
-                The file type identifier map. The key is the file signature and
-                the value is file type name. If the file_type_map is not
-                provided, the file will be identified by the file extensions.
-            sign_lenght : int, optinal
-                The maximum file signature length.
 
             Return
             ------
-            The item type.
+            The item extension as a string. If the item is a directory, it
+            returns 'directory'.
         """
         if os.path.isdir(item):
             return 'directory'
         else:
-            f = open(item, "rb")
-            sign = str(f.read(sign_lenght))
-            file_type = ""
-            for k, v in file_type_map.items():
-                if sign.startswith(k):
-                    file_type = v
-            if file_type == "":
-                # Can not indentify file from the file type map
-                # Then get file type from the file extensions
-                filename, file_type = os.path.splitext(item)
+            filename, file_type = os.path.splitext(item)
             return file_type
+
+    def get_parser(self, item):
+        """Get the right parser for the item according to the item type. The
+        item type will be indentified by file extension checking and parser's
+        double checking.
+
+        Parameter
+        ---------
+        item : str
+            The full path to the item.
+        """
+        item_ext = self._check_ext(item)
+        if item_ext not in self.ext_map:
+            return
+        else:
+            for tp in self.ext_map(item_ext):
+                if tp.check_type(item):
+                    return tp
+                else:
+                    return
+
+    # TODO add functions to read the old file lists and not crawl the loged
+    # files  
 
     def crawl_dir(self, recusive=True):
         pass
