@@ -28,19 +28,20 @@ class ParserBase:
 
     Atributes
     ---------
-    parse_funs: dict
+    parse_funs: tuple
         The request information name and the method/callable functions to get
-        the information. The key is the request information name (in ADX this
-        attribute will be used as the database column name.), and the associated
-        value is the callable fucntions that parse the information. The default
-        is an empty dictionary.
+        the information. The first element is the request information name (in
+        ADX this attribute will be used as the database column name.), and the
+        second value is the callable fucntions that parse the information.
+        One should organize the parse functions accordingly. 
+        The default is an empty tuple.
     """
     def __init__(self, file_type, extensions):
         self.file_type = file_type
         if isinstance(extensions, str):
             extensions = [extensions,]
         self.extensions = extensions
-        self.parse_funcs = {}
+        self.parse_funcs = ()
 
     def __call__(self, filename, **kwargs):
         """ High-level parse_info method.
@@ -55,11 +56,11 @@ class ParserBase:
         if not self.check_type(filename):
             return None
         else:
-            if parse_funcs == {}:
+            if parse_funcs == ():
                 raise ValueError("Parser needs parse functions.")
             result = {}
-            for k, v in self.parse_funs.items():
-                result[k] = v(filename, **kwargs)
+            for k, f in self.parse_funs:
+                result[k] = f(filename, **kwargs)
             return result
 
     def check_type(self, filename):
