@@ -9,8 +9,9 @@ import os
 
 
 class Crawler:
-    """ Crawler is designed to traverse and log all the items including the
-        subdirectories in a directory.
+    """ Crawler is designed to traverse all the items including the
+        subdirectories in a directory. After the crawling, it returns a list of
+        target files and their parser. 
 
         Parameter
         ---------
@@ -24,7 +25,8 @@ class Crawler:
 
         Note
         ----
-        Crawler only parses the file types that have parser_template provided.
+        Crawler only parses the file types that have the `Parser` object
+        provided.
     """
     def __init__(self, dir_name, parsers, recusive=True):
         self.root_dir = dir_name
@@ -84,6 +86,9 @@ class Crawler:
         ---------
         item : str
             The full path to the item.
+        Return
+        ------
+        The Parser class
         """
         item_ext = self._check_ext(item)
         if item_ext not in self.ext_map:
@@ -96,7 +101,7 @@ class Crawler:
                     return
 
     # TODO add functions to read the old file lists and not crawl the loged
-    # files  
+    # files
 
     def crawl_dir(self, recusive=True):
         pass
