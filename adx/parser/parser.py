@@ -1,4 +1,4 @@
-""" parser.py implements the parser base class, which defines the base API for
+item""" parser.py implements the parser base class, which defines the base API for
     different parser type.
 """
 
@@ -6,14 +6,14 @@ import os
 from astropy import log
 
 
-__all__ = ["ParserBase", "DirParser"]
+__all__ = ["ParserBase",]
 
 
 class ParserBase:
     """Base class for all types of parser.
 
     ParserBase class defines the high-level API for the subclass of parser. It
-    contains the wrapper methods that call the file type check functions and
+    contains the wrapper methods that call the item type check functions and
     all the user defined parse functions.
 
     The Parser class is a callable class which returns all the information
@@ -21,35 +21,46 @@ class ParserBase:
 
     Parameters
     ----------
-    file_type : str
+    item_type : str
         Type name.
     extensions: str or list
-        All the acceptable file extensions.
+        All the acceptable item extensions.
+    reader_cls : class or callable, optional
+        A reader class/function returns the object that provides the methods to
+        help interpret the data. For instance, a simple reader is the `open()`
+        function. The default is None
+    reader_args: dict, optional
+        The extra arguments that needed by the reader.
 
     Atributes
     ---------
-    parse_funs: tuple
+    parse_funs: list of tuple
         The request information name and the method/callable functions to get
         the information. The first element is the request information name (in
         ADX this attribute will be used as the database column name.), and the
         second value is the callable fucntions that parse the information.
         One should organize the parse functions accordingly.
-        The default is an empty tuple.
+        The default is an empty list.
+    reader: instance
+        An item instance provides the methods to interpret the data.
     """
-    def __init__(self, file_type, extensions):
-        self.file_type = file_type
+    def __init__(self, item_type, extensions, reader_cls=None, reader_args={}):
+        self.item_type = item_type
         if isinstance(extensions, str):
             extensions = [extensions,]
         self.extensions = extensions
-        self.parse_funcs = ()
+        self.reader_cls = reader_cls
+        self.reader_args = reader_args
+        self.reader = None
+        self.parse_funcs = []
 
-    def __call__(self, filename, **kwargs):
+    def __call__(self, itemname, **kwargs):
         """ High-level parse_info method.
 
         Paremeters
         ----------
-        filename : str
-            Full path to the file.
+        itemname : str
+            Full path to the item.
         **kwargs :
             Addtional input to the parse functons.
 
@@ -58,52 +69,31 @@ class ParserBase:
         This if for the general purpose, however, it can be redefined in the
         subclass.
         """
-        if not self.check_type(filename):
+        if not self.check_type(itemname):
             return None
         else:
-            if parse_funcs == ():
+            if parse_funcs == []:
                 raise ValueError("Parser needs parse functions.")
             result = {}
             for k, f in self.parse_funs:
-                result[k] = f(filename, **kwargs)
+                result[k] = f(itemname, **kwargs)
             return result
 
-    def check_type(self, filename):
-        """ User defined file type checker.
+    def check_type(self, itemname):
+        """ User defined item type checker.
 
         Paremeter
             ---------
-            filename : str
-                The file name
+            itemname : str
+                The item name
             Return
             ------
-            If the file belongs to the defined type, return True, otherwrise
+            If the item belongs to the defined type, return True, otherwrise
             False.
         """
         raise  NotImplementedError
 
-
-class DirParser(ParserBase):
-    """ A parser class for the directory. The directory parser is designed to
-    collect the over all information from a directory. It is able to read the old
-    directory logs, if provided, and provide updates on the directory
-    information. If the log is not provided, it will create a directory log
-    based on the current status.
-    """
-    def __init__(self):
-        super().__init__('directory', 'directory')
-
-    def set_up(self):
-        pass
-
-    def check_type(self, filename):
-        return os.path.isdir(filename)
-
-    def read_logs(self, input_log=None, log_format=None):
-        pass
-
-    def cur_item_num(self, dir_name):
-        return len(os.path.listdir(dir_name))
-
-    def last_update(self, dir_name):
-        pass
+    def get_reader(self, name):
+        """ Help function to build the reader instance.
+        """
+        raise  NotImplementedError
