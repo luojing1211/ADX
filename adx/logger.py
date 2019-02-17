@@ -30,7 +30,7 @@ class Logger:
     @property
     def types(self):
         parsers = list(set(self.target_items.keys()))
-        t = [p.file_type for p in parsers]
+        t = [p._type for p in parsers]
         return t
 
     def set_up_table(self):
@@ -43,7 +43,7 @@ class Logger:
         """
         info  = parser(item)
         entry = ()
-        for tc in self.tables_cols[parser.file_type]:
+        for tc in self.tables_cols[parser._type]:
             entry += (info[tc],)
         return entry
 
@@ -51,4 +51,4 @@ class Logger:
         pass
 
     def write_info(self):
-        pass 
+        pass

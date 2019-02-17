@@ -11,21 +11,21 @@ import os
 class Crawler:
     """ Crawler is designed to traverse all the items including the
         subdirectories in a directory. After the crawling, it returns a list of
-        target files and their parser. 
+        target items and their parser.
 
         Parameter
         ---------
         dir_name : str
             Directory name
         parsers : list
-            A list of `Pareser object` for each file type.
+            A list of `Pareser object` for each item type.
         recusive: bool, optional
             The flag that tells if the crawler to go through the subdirecotries.
             The default is 'True'.
 
         Note
         ----
-        Crawler only parses the file types that have the `Parser` object
+        Crawler only parses the item types that have the `Parser` object
         provided.
     """
     def __init__(self, dir_name, parsers, recusive=True):
@@ -43,7 +43,7 @@ class Crawler:
 
     def set_up(self):
         """ This function prepares the crawler. It does the following steps:
-        1. Gather the file types information for the parsers.
+        1. Gather the item types information for the parsers.
         2. Build the extension map
         ....
         """
@@ -51,7 +51,7 @@ class Crawler:
         self.ext_map = {}
         # get all the types and build the extension map.
         for p in self.parsers:
-            self.target_types.append(p.file_type)
+            self.target_types.append(p.item_type)
             for ext in p.extensions:
                 if ext not in self.ext_map.keys():
                     self.ext_map[ext] = [p,]
@@ -74,12 +74,12 @@ class Crawler:
         if os.path.isdir(item):
             return 'directory'
         else:
-            filename, file_type = os.path.splitext(item)
-            return file_type
+            itemname, item_type = os.path.splitext(item)
+            return item_type
 
     def get_parser(self, item):
         """Get the right parser for the item according to the item type. The
-        item type will be indentified by file extension checking and parser's
+        item type will be indentified by item extension checking and parser's
         double checking.
 
         Parameter
@@ -100,8 +100,8 @@ class Crawler:
                 else:
                     return
 
-    # TODO add functions to read the old file lists and not crawl the loged
-    # files
+    # TODO add functions to read the old item lists and not crawl the loged
+    # items
 
     def crawl_dir(self, recusive=True):
         pass
