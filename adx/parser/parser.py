@@ -1,4 +1,4 @@
-item""" parser.py implements the parser base class, which defines the base API for
+""" parser.py implements the parser base class, which defines the base API for
     different parser type.
 """
 
