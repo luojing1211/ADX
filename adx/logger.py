@@ -36,14 +36,14 @@ class Logger:
     def set_up_table(self):
         self.tables_cols = {}
         for prs in self.parsers:
-            self.tables_cols[prs] = [pf[0] for pf in prs.parse_funcs]
+            self.tables_cols[prs] = [pi for pi in prs.info_list]
 
     def get_info_entry(self, item, parser):
         """ Parse the item information following the table column.
         """
         info  = parser(item)
         entry = ()
-        for tc in self.tables_cols[parser._type]:
+        for tc in self.tables_cols[parser.item_type]:
             entry += (info[tc],)
         return entry
 

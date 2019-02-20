@@ -34,13 +34,9 @@ class ParserBase:
 
     Atributes
     ---------
-    parse_funs: list of tuple
-        The request information name and the method/callable functions to get
-        the information. The first element is the request information name (in
-        ADX this attribute will be used as the database column name.), and the
-        second value is the callable fucntions that parse the information.
-        One should organize the parse functions accordingly.
-        The default is an empty list.
+    info_list: list
+        The list of information that parser returns. This will be used in the
+        logger.  
     reader: instance
         An item instance provides the methods to interpret the data.
     """
@@ -52,7 +48,7 @@ class ParserBase:
         self.reader_cls = reader_cls
         self.reader_args = reader_args
         self.reader = None
-        self.parse_funcs = []
+        self.info_list = []
 
     def __call__(self, itemname, **kwargs):
         """ High-level parse_info method.
@@ -69,15 +65,7 @@ class ParserBase:
         This if for the general purpose, however, it can be redefined in the
         subclass.
         """
-        if not self.check_type(itemname):
-            return None
-        else:
-            if parse_funcs == []:
-                raise ValueError("Parser needs parse functions.")
-            result = {}
-            for k, f in self.parse_funs:
-                result[k] = f(itemname, **kwargs)
-            return result
+        raise NotImplementedError
 
     def check_type(self, itemname):
         """ User defined item type checker.
