@@ -1,7 +1,5 @@
 # imports
 import Parser, ParserType, Crawler, Logger
-from somewhere import GiveDM, GiveSN, GiveMJD, GiveJName
-from somewhereelse import MyFilReader
 # definition
 Parser myParser
 Crawler myCrawler

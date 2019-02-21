@@ -1,6 +1,8 @@
 '''
 So this is the only file which user will have to provide 
 '''
+from somewhere import GiveDM, GiveSN, GiveMJD, GiveJName
+from somewhereelse import MyFilReader
 # defining my parsertype
 ParserType prof
 prof.AddExtensionRule('prof')
