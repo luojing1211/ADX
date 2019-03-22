@@ -10,8 +10,8 @@ import os
 
 class Crawler:
     """ Crawler is designed to traverse all the items including the
-        subdirectories in a directory. After the crawling, it returns a list of
-        target items and their parser.
+        subdirectories in a directory. After the crawling, it returns 
+        a list of target items and their parser.
 
         Parameter
         ---------
@@ -22,6 +22,8 @@ class Crawler:
         recusive: bool, optional
             The flag that tells if the crawler to go through the subdirecotries.
             The default is 'True'.
+        batch : int, optional
+            Sets the size of the batch which are processed at once. 
 
         Note
         ----
