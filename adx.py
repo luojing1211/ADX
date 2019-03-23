@@ -6,7 +6,8 @@ Mind=Blown
 
 from adx.parser import parser
 from adx.crawler import crawler
-from adx.logger import logger
+from adx.io import dbio
+from adx.io import tabio
 
 class Adx(object):
     def __init__(self, craw, pars, logg, 
@@ -29,20 +30,27 @@ class Adx(object):
         else:
             raise ADXCrawlError("Parser not understood.")
         # logger setup
-        self.logger = logg
+        self.logtype = logg
+        self.logger = dbio() if logg == 'db' else tabio()
+        if logg == 'db':
+            self.logger = dbio()
+        elif logg == 'tab':
+            self.logger = tabio()
+        else:
+            raise ADXLogError("Logger type not understood.")
         # misc options
         self.daemon = daemon
         self.debug = debug
         self.verbose = 3 if debug else verbose
         self.numthreads = numthreads if numthreads < mp.cpu_count() else mp.cpu_count()
-        # max number of threads is CPU
+        # max number of threads is number of CPUs
 
     def __step(self,currdir, curr):
         # moving mountains
         # one rock at a time
-        # `batchsize` number of elements
-        pt, parsedCurr = self.parsers.parseAction(curr)
-        self.logger.log(pt, currdir, parsedCurr)
+        # to ensure grouped and make use of InsertMany
+        for pt, payload in self.parsers.parseAction(curr):
+            self.logger.InsertMany(pt, payload)
 
     def __setup(self):
         # this isn't necessary anymore 

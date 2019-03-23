@@ -1,54 +1,78 @@
-"""Logger.py defines the class for recording the parsed information and create
-the indexing table.
-"""
-from astropy import log
+'''
+Logger class definition
+'''
+
+from adx.io import dbio
+from adx.io import tabio
 
 
-class Logger:
-    """Logger class is designed to record the file or directory information to
-    a data table. A logger operates on a list of files (with full path) and the
-    associated file parser. The output file can be customerized by the user
+class Logger(dbio, tabio):
+    '''
+    Logger class
+    '''
+    def __init__(self, name=None, numtables=1, writeDB=None):
+        if self.validIP(name):
+            # need to write to a db
+            self.sqldb = True
+            self.log = dbio(ip, port, writeDB)
+            if writeDB is None:
+                self.writedb = name
+            else:
+                self.writedb = writeDB
+        else:
+            # need to write tables
+            self.logdir = name
 
-    Parameters
-    ----------
-    target_items : dict
-       The items need to be parsed. The key is the full path to the item, and
-       the value is the parser for the item type.
-    """
-    def __init__(self, target_items):
-        self.target_items = target_items
-        self.set_up_table()
+    def __addSchema(self, name, dtype):
+        if name in self.schema:
+            raise ADXLogError("Schema ill-defined.")
+        self.schema.append(name)
+        self.schema_dtype.append(dtype)
 
-    @property
-    def items(self):
-        return list(self.target_items.keys())
+    def __prepareLog(self):
+        self.log()
 
-    @property
-    def parsers(self):
-        return list(set(self.target_items.keys()))
+    def getSchema(self, schema):
+        '''
+        Private method which gets schema from Parser objects.
 
-    @property
-    def types(self):
-        parsers = list(set(self.target_items.keys()))
-        t = [p._type for p in parsers]
-        return t
+        Parameters
+        ----------
 
-    def set_up_table(self):
-        self.tables_cols = {}
-        for prs in self.parsers:
-            self.tables_cols[prs] = [pf[0] for pf in prs.parse_funcs]
+        schema : list or str
+            schema <- 'sn:float'
+            schema <- 'backend:str(256)'
+            schema <- [ 'sn:float', 'backend:str(256)'  ]
 
-    def get_info_entry(self, item, parser):
-        """ Parse the item information following the table column.
-        """
-        info  = parser(item)
-        entry = ()
-        for tc in self.tables_cols[parser._type]:
-            entry += (info[tc],)
-        return entry
+        Note
+        ----
 
-    def log_info(self):
-        pass
+        You shouldn't probably call this on your own unless you know what you're doing.
+        '''
+        if isinstance(schema, list):
+            # multiple schemas
+            for s in schema:
+                par, val = s.split(':')
+                self.__addSchema(par, val)
+        elif isinstance(schema,str):
+            # only one schema
+            par, val = schema.split(':')
+            self.__addSchema(par, val)
+            
+    def log(self, pt, ddir, data):
+        '''
+        Single atomic action resolution for a filepath
 
-    def write_info(self):
-        pass
+        Parameters
+        ----------
+
+        data : dict ? 
+            which is to be retured by the Parser
+        '''
+        if pt not in self.schema:
+            raise ADXLogError("ParserType not recognized.")
+        if self.sqldb:
+            self.__writeDB(ddir, data)
+            # INSERT INTO ?(pt) VALUES (?,?,?...)
+        else self.atables:
+            self.__writeTab(ddir, data)
