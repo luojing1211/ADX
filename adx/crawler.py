@@ -25,7 +25,7 @@ class Crawler:
 
     def __iter__(self):
         # yield a tuple dawg
-        for cd in cdir:
+        for cd in self.workd:
             for dirpath, dirs, files in  os.walk(cd, followlinks = self.flinks):
                 yield dirpath, files
 
