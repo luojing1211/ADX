@@ -1,4 +1,4 @@
-adx --connect localhost:84001 --one-session
+adx connect localhost:84001 --one-session
 adx schema
 adx query -par sn --cond gt 5 --cond lt 10
 adx query -par mjd --cond gt 58255 

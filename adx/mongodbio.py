@@ -1,20 +1,11 @@
 '''Handles db io'''
 
-# Are we using NoSQL? 
-# MySQL?
-# MongoDB?
-# Why are bothering about schema?? 
-# I feel so dumb at times. 
+from adxceptions import ADXLogImportError
 
-'''
-MongoDB --> single db.
-MongoDB --> every collection corresponds to a particular parserType 
-Although no schema is enforced in MongoDB, instead of doing blind collection scan everytime, 
-it be better to have indexing whenever so that querying can be optimized. 
-Schema is therefore not enforced.
-'''
-
-import pymongo as pmdb
+try:
+    import pymongo as pmdb
+except ImportError:
+    raise ADXLogImportError("Mongodb not found/installed.")
 
 class dbio(pmdb.MongoClient):
     def __init__(self,
@@ -28,13 +19,6 @@ class dbio(pmdb.MongoClient):
         self.schema = {ix:[] for ix in self.ptypes}
 
     def __getitem__(self, key):
-        # XXX Is this proper? To have exception in conditionals
-        # mongodb docs say that it creates dbs and collections if we send something for the first time.
-        # i am counting on it 
-        # if key not in self.ptypes:
-            # raise KeyError("ParserType key not found.")
-        # return self[self.dbname][key]
-        # return super(dbio, self).__getitem__(self.dbname).__getitem__(key)
         return pmdb.MongoClient.__getitem__(self, self.dbname).__getitem__(key)
 
     def __feedSchema__(self, schema):
@@ -53,10 +37,10 @@ class dbio(pmdb.MongoClient):
         # we anyway shouldn't have any duplicates smh
 
 
-    def Query(self, qpt, query):
+    def Query(self, qpt, query, projection = "{_id: 0}"):
         # need to decide on the grammar
         # TODO it be fun to implement this
-        return self[qpt].find(query)
+        return self[qpt].find(query, projection)
 
     def InsertOne(self, qpt, payload):
         return self[qpt].insert_one(payload)

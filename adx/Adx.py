@@ -1,47 +1,41 @@
 '''
-So, you thought making an adx class would be illegal. 
-Mind 100. Speech 100. Shittttttttttt justttttt gotttt reaaalllll.
-Mind=Blown
+ADX main class definition
 '''
-# local stuff
+# ADX stuff
 from parser import Parser
 from crawler import Crawler
-import mongodbio
-import tabio
 # other stuff
 import multiprocessing as mp
 
 __all__ = ['Adx']
 
 class Adx(object):
-    def __init__(self, cdir, pars, 
-            logg = 'mongodb', 
-            name = 'ttt',
+    def __init__(self, cdir, pars, logg,
             daemon=True, 
             verbose=0, 
             numthreads=1,
             debug=False):
         '''
-        Why even expose Parser class out?
-        Make Adx take variable inputs of ParserType instances
-        and include them inside. 
+        Arguments
+        ---------
 
-        We are just exposing one class that way. Rest is taken care inside and internally.
-        
-        Signatures not implemented. 
+        cdir : str, or list of str
+            Directory or list of directories to crawl
+        pars : instance of Parser or list of ParserTypes
+        logg : any instance of logging
+
         '''
         # crawl setup
         self.crawler = Crawler(cdir)
         # parse setup
-        self.parsers = pars
+        if isinstance(Parser, pars):
+            self.parsers = pars
+        elif isinstance(list, pars):
+            self.parsers = Parser()
+            for pt in pars:
+                self.parsers.AddParserType(pt)
         # logger setup
-        self.logtype = logg
-        if logg == 'mongodb':
-            self.logger = mongodbio.dbio(dbname = name)
-        elif logg == 'tab':
-            self.logger = tabio()
-        else:
-            raise ValueError("Logger type not understood.")
+        self.logger = logg
         # misc options
         self.daemon = daemon
         self.debug = debug
