@@ -1,6 +1,8 @@
 #!/usr/bin/env python2.7
 
 _VERSION_ = "0.0.1"
+_PERSISTANCE_FILE_NAME_ = "/tmp/adx_persistant_logger"
+_PERSISTANCE_KEY_ = 'ala'
 
 import argparse
 import subprocess as sp
@@ -10,6 +12,8 @@ import logging
 # log setup
 logging.basicConfig(format='[%(levelname)s] %(message)s')
 mylog = logging.getLogger()
+
+
 
 def parseargs():
     adxargparser = argparse.ArgumentParser(prog="ADX", description="Command line interface to ADX", epilog="ADX v"+_VERSION_)
@@ -22,16 +26,21 @@ def parseargs():
     rgroup = subs.add_parser("refresh", help="Refreshs database.")
     ## update
     ugroup = subs.add_parser("update", help="Updates database.")
+    ## crawl
+    crawlgroup = subs.add_parser("crawl", help="Crawl action.")
+    addarg = crawlgroup.add_argument
+    addarg("-d,dir", help="Directories", action='store', nargs='*', dest='DIRS')
+    addarg("-p,parse", help="ParserType files", action='store', nargs='*', dest='PTS')
     ## connect
     cgroup = subs.add_parser("connect", help="Connect help")
     addarg = cgroup.add_argument
-    addarg("--one-session", action='store_true', default=True, dest='persist', help="Flag to make persist connection.")
     addarg("-n,name", help="Name of the ADX/Project", default='adx', dest='NAME')
+    addarg("--one-session", action='store_true', default=True, dest='persist', help="Flag to make persist connection.")
     ## db options
     cgroup_subs = cgroup.add_subparsers(help="Interfaces", dest='interface')
     dbcgroup = cgroup_subs.add_parser("mongodb", help="MongoDB interface")
     addarg = dbcgroup.add_argument
-    addarg("--connect", help='IP to connect to database.', default='127.0.0.1:12701', metavar='X.X.X.X:P')
+    addarg("--connect", help='IP to connect to database.', default='127.0.0.1:27017', metavar='X.X.X.X:P')
     ## tab options
     tabcgroup = cgroup_subs.add_parser("table", help="Astropy Table interface")
     addarg = tabcgroup.add_argument
@@ -45,21 +54,74 @@ def parseargs():
     addarg("--out", help="Output filepaths")
     addarg("--explain", help="Explain query")
     addarg("--absolute", action='store_true', help="Return absolute paths")
+    addarg("parsertype", help="The parserType", nargs=1)
+    addarg("query", help="JSON-like query\nYou will need to quote it.")
     ####
     return adxargparser.parse_args()
 
 def main():
+    ### this function returns
+    logger = None
+    persister = None
+    ###
     opts = parseargs()
     if opts.cmd == 'schema':
         print "requested schema"
+    elif opts.cmd == 'connect':
+        print "requested connect"
+        if opts.interface == 'mongodb':
+            print "requested mongodb"
+            print "Connect at ", opts.connect
+            print "DBname is ", opts.NAME
+            import mongodbio
+            logger = mongodbio.dbio(name = opts.connect, dbname = opts.NAME)
+            print type(logger)
+        elif opts.interface == 'table':
+            print 'requested tabio'
+            print "tabpath", opts.tabpath
+            import tabio
+            logger = tabio.tabio()
+        if opts.persist:
+            print "Asked for persistance"
+            # same filename
+            from adxshelver import Shelver
+            persister = Shelver(_PERSISTANCE_FILE_NAME_)
+            persister.save(_PERSISTANCE_KEY_, logger)
+            # XXX ala is for now a hack. 
+            # you need a persistent name too
+    elif opts.cmd == 'crawl':
+        # from imp import load_source
+        # XXX this is deprecated!!!
+        import importlib
+        print "requested crawl"
+        print "DIRS:", opts.DIRS
+        print "PT files", opts.PTS
+        pts = [importlib.import_module(p) for p in opts.PTS]
+        print pts 
     elif opts.cmd == 'refresh':
         print "requested refresh"
     elif opts.cmd == 'update':
         print "requested update"
     elif opts.cmd == 'query':
-        print "requested query"
+        pt = opts.parsertype[0]
+        print "queried parsertype", pt
+        import ast
+        query = ast.literal_eval(opts.query)
+        print "requested query", opts.query
+        from adxshelver import Shelver 
+        persister = Shelver(_PERSISTANCE_FILE_NAME_)
+        logger = persister.get(_PERSISTANCE_KEY_)
+        logger.Query(pt, query)
     elif opts.cmd == 'logout':
         print "requested logout"
+        from adxshelver import Shelver 
+        persister = Shelver(_PERSISTANCE_FILE_NAME_)
+        persister.close()
+    ### graceful termination
+    logger and logger.close()
+    persister and persister.close()
+    print "Exiting main"
+    return opts
 
 if __name__ == '__main__':
-    main()
+    opts = main()

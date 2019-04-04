@@ -282,6 +282,14 @@ class ParserType:
         '''
         self.reader = readme
 
+    def AddPar(self, description, func, dtype='float', length=None):
+        '''
+        Why have two functions when one function can do the job?
+        '''
+        self.dtypes.append( dtype if length else dtype+str(length) )
+        self.schema.append( description  )
+        self.funcs.append( func )
+
     def AddFloat(self, description, func):
         '''
         Method to add a statistics to be tracked by ADX.

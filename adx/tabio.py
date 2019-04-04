@@ -14,3 +14,6 @@ class tabio:
         # need to decide on the grammar
         # TODO it be fun to implement this
         pass
+
+    def close(self):
+        pass

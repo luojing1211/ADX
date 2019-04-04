@@ -14,6 +14,7 @@ class dbio(pmdb.MongoClient):
             ):
         ip, port = name.split(':')
         super(dbio, self).__init__(name)
+        self.name = name
         self.dbname = dbname
         self.ptypes = super(dbio, self).__getitem__(self.dbname).list_collection_names()
         self.schema = {ix:[] for ix in self.ptypes}
@@ -35,6 +36,11 @@ class dbio(pmdb.MongoClient):
                 self.schema[k] = v
         assert set(self.schema.keys()) == set( self.ptypes )
         # we anyway shouldn't have any duplicates smh
+
+    def __reduce__(self):
+        # to make pickled
+        # https://stackoverflow.com/questions/19855156/whats-the-exact-usage-of-reduce-in-pickler
+        return (self.__class__, (self.name, self.dbname))
 
 
     def Query(self, qpt, query, projection = "{_id: 0}"):
