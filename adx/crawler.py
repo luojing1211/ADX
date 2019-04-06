@@ -119,7 +119,7 @@ class Crawler:
         Return
         ------
         A list of DirProcessors. These processors has the parser information so
-        it can be sent to the logging function directly. 
+        it can be sent to the logging function directly.
         Note
         ----
         Crawler only parses the item types that have the `Parser` object
@@ -139,9 +139,6 @@ class Crawler:
                 else:
                     ext_map[e].append(p)
         return ext_map
-
-    def process_dir(self, self.ext_map):
-        pass
 
     def walk(self):
         # use DirProcessor['directory'] as linker to the next level.
