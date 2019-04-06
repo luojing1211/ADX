@@ -36,12 +36,12 @@ class ParserBase:
     ---------
     info_list: list
         The list of information that parser returns. This will be used in the
-        logger.  
+        logger.
     reader: instance
         An item instance provides the methods to interpret the data.
     """
-    def __init__(self, item_type, extensions, reader_cls=None, reader_args={}):
-        self.item_type = item_type
+    def __init__(self, name, extensions, reader_cls=None, reader_args={}):
+        self.name = name
         if isinstance(extensions, str):
             extensions = [extensions,]
         self.extensions = extensions
@@ -49,14 +49,15 @@ class ParserBase:
         self.reader_args = reader_args
         self.reader = None
         self.info_list = []
+        self.type_checker =[]
 
-    def __call__(self, itemname, **kwargs):
+    def __call__(self, itemnames, **kwargs):
         """ High-level parse_info method.
 
         Paremeters
         ----------
-        itemname : str
-            Full path to the item.
+        itemname : list
+            Full path to the items that in this parser type.
         **kwargs :
             Addtional input to the parse functons.
 
@@ -85,3 +86,12 @@ class ParserBase:
         """ Help function to build the reader instance.
         """
         raise  NotImplementedError
+
+    def add_checker(self, condition, priority=None):
+        if priority is None:
+            self.type_checker.append(condition)
+        else:
+            self.type_checker.insert(priority, condition)
+
+    def add_parse_info(self, name, function, help=None, dtype=None):
+        pass
