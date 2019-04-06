@@ -1,11 +1,23 @@
 """crawler.py defines the ADX crawler and supporting functions.
    The functionality of ADX crawler.
-   1. Navigate through one directory
-   2. Check item type
-   3. Log data file information.
+   1. Navigate through the target directory
+   2.
+
 """
 
 import os
+
+
+class DirProcessor:
+    """ DirProcessor is a class to collect information from the directory,
+    including file types and file numbers.
+
+    Parameter
+    ---------
+    dir_name: str
+        The name of directory
+    """
+    def __init__(self, dir_name):
 
 
 class Crawler:
