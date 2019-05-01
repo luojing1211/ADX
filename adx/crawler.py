@@ -23,7 +23,7 @@ class DirProcessor(dict):
         self.dir_log = dir_log # Here needs a function of reading the dir_log
         self.all_items = [os.path.join(self.path, item) for item in os.listdir()]
         self.update = True # This is a flag for the parser.
-        self.update({'unknown': [], 'uncate':[], 'directory':[])
+        self.update({'unknown': [], 'uncate':[], 'directory':[]})
         self.setup()
 
     def setup(self):
@@ -39,11 +39,12 @@ class DirProcessor(dict):
     @property
     def history_modify_time(self):
         """Get the modify time in the log"""
-        if self.dir_log = None:
+        if self.dir_log == None:
             return 0.0
         else:
             mt = [os.path.getmtime(x) for x in self.dir_log.files]
             return mt
+
 
     @property
     def modify_time(self):
@@ -69,7 +70,7 @@ class DirProcessor(dict):
         item_ext =  os.path.splitext(item_path)[1]
         # Get all the parsers for checkin unknow extensions.
         all_parsers = []
-        for plist in parsers.values()
+        for plist in parsers.values():
             all_parsers.append(plist)
         all_parsers = list(set(all_parsers))
         cateloged = True
