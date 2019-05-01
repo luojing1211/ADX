@@ -18,10 +18,10 @@ class DirProcessor(dict):
         The name of directory
     """
     def __init__(self, dir_path, parent=None, dir_log=None):
-        self.path = abspath(dir_path)
+        self.path = os.abspath(dir_path)
         self.parent = parent
         self.dir_log = dir_log # Here needs a function of reading the dir_log
-        self.all_items = [os.path.join(self.paht, item) for item in os.listdir()]
+        self.all_items = [os.path.join(self.path, item) for item in os.listdir()]
         self.update = True # This is a flag for the parser.
         self.update({'unknown': [], 'uncate':[], 'directory':[])
         self.setup()
@@ -63,7 +63,7 @@ class DirProcessor(dict):
 
         Return
         ------
-        cateloged
+        cataloged
         """
         # First try to indentify the file type from the extensions
         item_ext =  os.path.splitext(item_path)[1]
@@ -95,7 +95,7 @@ class DirProcessor(dict):
         return cateloged
 
     def update_log(self):
-        """update the overall log in the directory """"
+        """update the overall log in the directory """
         pass
 
     def record_info(self):
@@ -105,7 +105,7 @@ class DirProcessor(dict):
 class Crawler:
     """ Crawler is designed to traverse all the items including the
         subdirectories in a directory. After the crawling, it returns a list of
-        target items and their parser.
+        target files and their parser.
 
         Parameter
         ---------
@@ -127,7 +127,7 @@ class Crawler:
     """
     def __init__(self, dir_name, parsers, log_file=None):
         self.root_dir = DirProcessor(dir_name, log_file=None)
-        self.parsers = parses
+        self.parsers = parsers
 
     @property
     def ext_map(self):
