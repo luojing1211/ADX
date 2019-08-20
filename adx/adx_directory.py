@@ -6,6 +6,11 @@ from astropy import log
 from astropy.time import Time
 
 
+def read_config(config_file):
+    cf = open(config_file, 'r')
+    return json.load(cf)
+
+
 class DataDirectory:
     """ DataDirectory is a class to collect information from the given data
     directory. Its subclasses will handled by a new DataDirectroy class.
@@ -26,42 +31,23 @@ class DataDirectory:
         if not self.isadx:
             self.config = None
         else:
-            self.config = self.read_config()
+            self.config = read_config(self.adx_config)
         self.subdirs = []
+        # have all subdirectory
         for item in self.all_items:
-            if os.path.isdir(item) and item != self.adx_config:
+            print(item)
+            if os.path.isdir(item) and item != os.basname(self.adx_dir):
                 self.subdirs.append(item)
 
     def validate(self):
         """Check if this directory an adx logged data directory.
         """
+        # Check if directory has config
         if os.path.exists(self.adx_config):
             return True
         else:
             return False
 
-#     def setup_adx(self):
-#         """ Setup the adx log directory, if it is not an adx logged directory.
-#         """
-#         if self.isadx:
-#             return
-#         else:
-#             # if there is no adx_dir, build one
-#             if not os.path.exists(self.adx_dir)
-#                 os.mkdir(adx_dir)
-#
-#             with open()
-#
-#
-#
-#         # Check modify time
-#         if self.modify_time < self.history_modify_time:
-#             self.update = False
-#         # setup all the files.
-#         for item in self.all_items:
-#             # Get all the subdirectories
-#             if os.isidir(item):
-#                 self['directory'].append(item)
 #
 #     def get_item_diff(self):
 #         pass
@@ -134,21 +120,25 @@ class DataDirectory:
 #         pass
 #
 #
-def setup_adx_dir(dir_path, target_file_exts):
+def init_adx_dir(dir_path, target_file_exts):
     """ Setup a directory for adx data indexing
 
-        Parameters
-        ----------
-        dir_path: str
-            Target directory path
-        target_file_exts: str list
-            The file extensions for indexing
+    Parameters
+    ----------
+    dir_path: str
+        Target directory path.
+
+    target_file_exts: str list
+        The file extensions for indexing.
+
+    recursive: bool, optional
+        If allow adx navigate to the subdirectory recursively. Default is True.
     """
     adx_dir = os.path.join(dir_path, 'adx_log')
     adx_config = os.path.join(adx_dir, 'config')
     if isinstance(target_file_exts, str):
         exts = set([target_file_exts,])
-    elif isinstance(tareget_file_exts, (list, tuple, set)):
+    elif isinstance(target_file_exts, (list, tuple, set)):
         exts = set(target_file_exts)
     else:
         raise ValueError("'target_file_exts' only accepts 'str', 'list', "
@@ -164,8 +154,8 @@ def setup_adx_dir(dir_path, target_file_exts):
     init_time = Time.now().iso
     config_info = {'path': adx_dir,
                    'init_time_utc': init_time,
-                   'file_extensions': exts}
+                   'file_extensions': list(exts)}
     config_info.update(ext_config)
     f = open(adx_config, "w")
-    f.write(str(config_info))
-    f.close()
+    json.dump(config_info, f, sort_keys=True, indent=4, separators=(',', ': '))
+    return
