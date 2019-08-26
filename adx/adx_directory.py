@@ -35,8 +35,7 @@ class DataDirectory:
         self.subdirs = []
         # have all subdirectory
         for item in self.all_items:
-            print(item)
-            if os.path.isdir(item) and item != os.basname(self.adx_dir):
+            if os.path.isdir(item) and item != self.adx_dir:
                 self.subdirs.append(item)
 
     def validate(self):
@@ -47,6 +46,21 @@ class DataDirectory:
             return True
         else:
             return False
+
+    @property
+    def target_exts(self):
+        return self.config['file_extensions']
+
+    def init_ext_table(self):
+        pass
+
+    def get_parse_info(self, ext_name):
+        try:
+            return self.config[ext_name]
+        except KeyError:
+            raise ValueError("{} is not in the target extension list.")
+
+
 
 #
 #     def get_item_diff(self):
