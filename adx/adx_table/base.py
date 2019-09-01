@@ -3,7 +3,8 @@ are derived from the base class.
 """
 import os
 
-
+# TODO make sure the table can be initizialed independly and we can combine the
+# tables. 
 class AdxTableBase(object):
     """Base class for adx table.
 
@@ -31,9 +32,10 @@ class AdxTableBase(object):
         Load ADXTable file
     """
 
-    def __init__(self, table_path, write=False):
+    def __init__(self, name=None, table_path=None):
         self.path = table_path
         self.write = write
+        if self.
         self.validate()
         if self.new_table:
             self.data = None
@@ -61,7 +63,7 @@ class AdxTableBase(object):
         self.table_name = os.path.basename(name_fields[0])
         self.table_ext = name_fields[1]
 
-    def read_table(self):
+    def read_table(self, path):
         """Load an ADX table from the path.
         """
         raise NotImplementedError("Defined in the subclass method.")
@@ -85,4 +87,4 @@ class AdxTableBase(object):
     def close(self):
         """close ADXTable object
         """
-        raise NotImplementedError("Defined in the subclass method.")
+        del self.data

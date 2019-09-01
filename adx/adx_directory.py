@@ -28,8 +28,8 @@ class DataDirectory:
     dir_name: str
         The name of directory.
 
-    table_ext: str
-        The extension of log table. Default '.csv'. This will help the table
+    table_file_exts: list
+        The extensions of log table. Default ['.csv',]. This will help the table
         reader and writer.
 
     table_type: `ADX table type` class
@@ -40,17 +40,24 @@ class DataDirectory:
        Right now it only use .csv file as the table file. In the future it can
        be expend to other types.
     """
-    def __init__(self, dir_path, table_ext='.csv', table_type=AstropyTable):
+    def __init__(self, dir_path, table_file_exts=['.csv',],
+                 table_type=AstropyTable):
         self.path = os.path.abspath(dir_path)
         self.parent = os.path.basename(self.path)
         self.all_items = [os.path.join(self.path, item) for item in
                           os.listdir(self.path)]
         self.log_dir = os.path.join(self.path, "adx_log")
         self.adx_config = os.path.join(self.log_dir, "config")
-        self.table_ext = table_ext
+        self.table_exts = table_file_exts
+        self.isadx = self.validate()
+        if not self.isadx:
+            self.config = None
+            self.master_table = None
+            self.log_tables = []
+        # Search
         self.master_table_path = os.path.join(self.log_dir, 'master' +
                                               self.table_ext)
-        self.isadx = self.validate()
+
         if not self.isadx:
             self.config = None
             self.master_table = None
@@ -65,10 +72,8 @@ class DataDirectory:
         self.subdirs = []
         # have all subdirectory
         for item in self.all_items:
-            print(item)
             if os.path.isdir(item) and item != os.basname(self.log_dir):
                 self.subdirs.append(item)
-
 
     def validate(self):
         """Check if this directory an adx logged data directory.
@@ -78,6 +83,21 @@ class DataDirectory:
             return True
         else:
             return False
+
+    def get_table_file(self, name):
+        """Search tables by name from all the extenstions.
+
+        Parameter
+        ---------
+        name: str
+            Table name.
+        """
+        target_table = []
+        for ext in self.table_exts:
+            for item in os.listdir(self.log_dir):
+                if item == name + ext:
+                    target_table.append(item)
+        return target_table
 
     @property
     def target_exts(self):
