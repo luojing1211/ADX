@@ -1,26 +1,20 @@
 """json_adx.py
 simple json ADXTable implementation
 """
-from .adx_table import ADXTableBase
+from .base import AdxTableBase
 import json
 import os
 
-class JsonAdxTable(ADXTableBase):
+class JsonAdxTable(AdxTableBase):
     """Simple Json table
     """
-    def __init__(self, name, fp=None):
-        if os.path.isfile(str(fp)):
-            self.loadfile(fp)
-        elif os.path.isdir(str(fp)):
-            # look for .adx subdirectory
-            if not os.path.isdir(os.path.join(fp, '.adx')):
-                os.makedirs(os.path.join(fp, '.adx'))
-            fp = os.path.join(fp, '.adx', str(name)+'.adx.json')
-            self.loadfile(fp)
-        else:
-            self.data = dict()
-        super(JsonTable, self).__init__(name, 'JSON', tablePath=fp)
+    def __init__(self, table_path, write=False):
+        super(JsonAdxTable, self).__init__(table_path, write=write)
 
+    def validate(self):
+        super(JsonAdxTable, self).validate()
+        if self.table_ext == '.json':
+            raise ValueError("Table file {} is not a JSON table.".format(self.path))
 
     def close(self):
         """close all open files

@@ -20,13 +20,8 @@ class AdxTableBase(object):
         the file does not exist, otherwrise it will over write the old table
         file. Defaul is False.
 
-    Attributes
-    ----------
-    _tablepath : str
-        Path to table file.
-
     Methods
-    _______
+    -------
     close()
         Clean up and close table file object.
     update(<user defined result object>)
@@ -40,10 +35,10 @@ class AdxTableBase(object):
         self.path = table_path
         self.write = write
         self.validate()
-        # Get the extension and the name
-        name_fields  = os.path.splitext(self.path)
-        self.table_name = os.path.basename(name_fields[0])
-        self.table_ext = name_fields[1]
+        if self.new_table:
+            self.data = None
+        else:
+            self.data = self.read_table()
 
     def validate(self):
         """Validation for the adx table. If the path does not exist, it will
@@ -51,16 +46,22 @@ class AdxTableBase(object):
         table.
         """
         if not os.path.exists(self.path):
+            self.new_table = True
             # check write flag
             if not self.write:
                 raise FileNotFoundError("Table file '{}'' is not found. For "
                                         "creating a new file please set the "
                                         "write flag to 'True'.".format(self.path))
         else:
+            self.new_table = False
             if not os.path.isfile(self.path):
                 raise ValueError("'{}' is not a file.".format(self.path))
+        # Get the extension and the name
+        name_fields  = os.path.splitext(self.path)
+        self.table_name = os.path.basename(name_fields[0])
+        self.table_ext = name_fields[1]
 
-    def read(self):
+    def read_table(self):
         """Load an ADX table from the path.
         """
         raise NotImplementedError("Defined in the subclass method.")

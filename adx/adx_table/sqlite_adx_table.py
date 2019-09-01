@@ -2,7 +2,7 @@
 sqlite3 ADXTable implementation
 """
 
-from .adx_table import AdxTable
+from .base import AdxTableBase
 import sqlite as sql
 import os
 
@@ -20,8 +20,8 @@ class SqliteAdxTable(AdxTableBase):
         Name of ADXTable implementation.
 
     """
-    def __init__(self, fp=None, name='SqliteTable'):
-        super(SqliteTable, self).__init__(name, tablepath=fp)
+    def __init__(self, table_path, write=False):
+        super(SqliteAdxTable, self).__init__(table_path, write=False)
         self.tableMap = None
         self.sqlConn = None
         self.sqlCursor = None
