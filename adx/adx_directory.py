@@ -4,11 +4,19 @@ import os
 import json
 from astropy import log
 from astropy.time import Time
+from astropy.utils import lazyproperty
+
+from .table import *
 
 
 def read_config(config_file):
+    # This is a temporary configuration reader.
     cf = open(config_file, 'r')
     return json.load(cf)
+
+
+def load_table(table_path, table_type=AstropyTable):
+    pass
 
 
 class DataDirectory:
@@ -18,25 +26,49 @@ class DataDirectory:
     Parameter
     ---------
     dir_name: str
-        The name of directory
+        The name of directory.
+
+    table_ext: str
+        The extension of log table. Default '.csv'. This will help the table
+        reader and writer.
+
+    table_type: `ADX table type` class
+        Date base table type. Default is the astropy table.
+
+    Note
+    ----
+       Right now it only use .csv file as the table file. In the future it can
+       be expend to other types.
     """
-    def __init__(self, dir_path):
+    def __init__(self, dir_path, table_ext='.csv', table_type=AstropyTable):
         self.path = os.path.abspath(dir_path)
         self.parent = os.path.basename(self.path)
         self.all_items = [os.path.join(self.path, item) for item in
                           os.listdir(self.path)]
-        self.adx_dir = os.path.join(self.path, "adx_log")
-        self.adx_config = os.path.join(self.adx_dir, "config")
+        self.log_dir = os.path.join(self.path, "adx_log")
+        self.adx_config = os.path.join(self.log_dir, "config")
+        self.table_ext = table_ext
+        self.master_table_path = os.path.join(self.log_dir, 'master' +
+                                              self.table_ext)
         self.isadx = self.validate()
         if not self.isadx:
             self.config = None
+            self.master_table = None
+            self.log_tables = []
         else:
             self.config = read_config(self.adx_config)
+            self.master_table = load_table(self.master_table_path,
+                                           self.table_ext)
+            self.log_tables = [tf for tf in os.listdir(self.log_dir) if
+                               (tf.endswith(self.table_ext) and not
+                                tf.startswith('master'))]
         self.subdirs = []
         # have all subdirectory
         for item in self.all_items:
-            if os.path.isdir(item) and item != self.adx_dir:
+            print(item)
+            if os.path.isdir(item) and item != os.basname(self.log_dir):
                 self.subdirs.append(item)
+
 
     def validate(self):
         """Check if this directory an adx logged data directory.
