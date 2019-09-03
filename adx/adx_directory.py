@@ -40,7 +40,7 @@ class DataDirectory:
        Right now it only use .csv file as the table file. In the future it can
        be expend to other types.
     """
-    def __init__(self, dir_path, table_file_exts=['.csv',],
+    def __init__(self, dir_path, table_file_exts='.csv',
                  table_type=AstropyTable):
         self.path = os.path.abspath(dir_path)
         self.parent = os.path.basename(self.path)
@@ -48,13 +48,8 @@ class DataDirectory:
                           os.listdir(self.path)]
         self.log_dir = os.path.join(self.path, "adx_log")
         self.adx_config = os.path.join(self.log_dir, "config")
-        self.table_exts = table_file_exts
+        self.table_ext = table_file_ext
         self.isadx = self.validate()
-        if not self.isadx:
-            self.config = None
-            self.master_table = None
-            self.log_tables = []
-        # Search
         self.master_table_path = os.path.join(self.log_dir, 'master' +
                                               self.table_ext)
 
@@ -84,21 +79,6 @@ class DataDirectory:
         else:
             return False
 
-    def get_table_file(self, name):
-        """Search tables by name from all the extenstions.
-
-        Parameter
-        ---------
-        name: str
-            Table name.
-        """
-        target_table = []
-        for ext in self.table_exts:
-            for item in os.listdir(self.log_dir):
-                if item == name + ext:
-                    target_table.append(item)
-        return target_table
-
     @property
     def target_exts(self):
         return self.config['file_extensions']
@@ -111,6 +91,9 @@ class DataDirectory:
             return self.config[ext_name]
         except KeyError:
             raise ValueError("{} is not in the target extension list.")
+
+    def get_modifiy_time(self):
+        pass 
 
 
 
