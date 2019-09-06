@@ -78,3 +78,6 @@ class TableWrapper(object):
         """close ADXTable object
         """
         del self.table
+
+    def quary_rows(self, column_name, value, condition_funcs):
+        return condition_funcs(self.table, column_name, value)

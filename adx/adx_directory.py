@@ -18,6 +18,9 @@ def read_config(config_file):
 def load_table(table_path, table_type=AstropyTable):
     pass
 
+def init_table(table_type, table_template, table_type=AstropyAdxTable):
+    table = table_type()
+    return table.init_table(table_template)
 
 class DataDirectory:
     """ DataDirectory is a class to collect information from the given data
@@ -44,8 +47,6 @@ class DataDirectory:
                  table_type=AstropyTable):
         self.path = os.path.abspath(dir_path)
         self.parent = os.path.basename(self.path)
-        self.all_items = [os.path.join(self.path, item) for item in
-                          os.listdir(self.path)]
         self.log_dir = os.path.join(self.path, "adx_log")
         self.adx_config = os.path.join(self.log_dir, "config")
         self.table_ext = table_file_ext
@@ -69,6 +70,8 @@ class DataDirectory:
         for item in self.all_items:
             if os.path.isdir(item) and item != os.basname(self.log_dir):
                 self.subdirs.append(item)
+        # catgory target exts
+        self.catelog = self.category_items()
 
     def validate(self):
         """Check if this directory an adx logged data directory.
@@ -83,8 +86,14 @@ class DataDirectory:
     def target_exts(self):
         return self.config['file_extensions']
 
-    def init_ext_table(self):
-        pass
+    @property
+    def all_items(self):
+        return [os.path.join(self.path, item) for item in os.listdir(self.path)]
+
+    @property
+    def directory_modify_time(self):
+    """Get the directory's newest modify time"""
+        return os.path.getmtime(self.path)
 
     def get_parse_info(self, ext_name):
         try:
@@ -92,9 +101,27 @@ class DataDirectory:
         except KeyError:
             raise ValueError("{} is not in the target extension list.")
 
-    def get_modifiy_time(self):
-        pass 
+    def category_items(self):
+        # This function only category items by extension.
+        categories = {}
+        for ext in self.target_exts:
+            category[ext] = []
+        for item is self.all_items:
+            item_ext = os.path.splitext(item).replace('.', '')
+            if item_ext in categories.keys():
+                categories[item_ext] += item
+        return categories
 
+    def get_ext_table(self, ext):
+        
+
+    def load_ext_table(self, ext):
+        # search
+        ext_names = self.master_table['ext_names']
+        np.where
+
+
+    def mt_diff(self, ext):
 
 
 #
