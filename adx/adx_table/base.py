@@ -4,8 +4,8 @@ are derived from the base class.
 import os
 
 # TODO make sure the table can be initizialed independly and we can combine the
-# tables. 
-class AdxTableBase(object):
+# tables.
+class TableWrapper(object):
     """Base class for adx table.
 
     ADX table are designed for the indexing the astronomical data file meta data
@@ -13,13 +13,14 @@ class AdxTableBase(object):
 
     Parameters
     ----------
+    table : table object
+        The table for wrappering.
+
     table_path: str
         The path to the table file.
 
-    wirte: bool, optional
-        The flag for writing the table. If true, adx will create a new file when
-        the file does not exist, otherwrise it will over write the old table
-        file. Defaul is False.
+    table_template: dict, optional
+        The template to initilze a new table.
 
     Methods
     -------
@@ -32,59 +33,51 @@ class AdxTableBase(object):
         Load ADXTable file
     """
 
-    def __init__(self, name=None, table_path=None):
-        self.path = table_path
-        self.write = write
-        if self.
-        self.validate()
-        if self.new_table:
-            self.data = None
-        else:
-            self.data = self.read_table()
+    def __init__(self, table=None, in_table_path=None, table_template={}):
+        self.table = table
+        self.in_table_path = in_table_path
+        self.table_template = table_template
+        # if table is not given check other options
+        if self.table is None:
+            if self.in_table_path is not None:
+                # Load table from path
+                self.table = self.read_table(self.in_table_path)
+            else:
+                self.table = self.init_table(self.table_template)
 
-    def validate(self):
-        """Validation for the adx table. If the path does not exist, it will
-        check write attribute. When write is true, it will set to create a new
-        table.
-        """
-        if not os.path.exists(self.path):
-            self.new_table = True
-            # check write flag
-            if not self.write:
-                raise FileNotFoundError("Table file '{}'' is not found. For "
-                                        "creating a new file please set the "
-                                        "write flag to 'True'.".format(self.path))
-        else:
-            self.new_table = False
-            if not os.path.isfile(self.path):
-                raise ValueError("'{}' is not a file.".format(self.path))
-        # Get the extension and the name
-        name_fields  = os.path.splitext(self.path)
-        self.table_name = os.path.basename(name_fields[0])
-        self.table_ext = name_fields[1]
+    def __getattr__(self, name):
+        try:
+            # Try to get the attribute from the wapper. Otherwrise get it from
+            # the table attribute.
+            if six.PY2:
+                return super(TableWrapper, self).__getattribute__(name)
+            else:
+                return super().__getattribute__(name)
+        except AttributeError:
+            try:
+                return self.table.__getattribute__(name)
+            except:
+                raise AttributeError("Can not find the attribute {}.".format(name))
 
     def read_table(self, path):
         """Load an ADX table from the path.
         """
         raise NotImplementedError("Defined in the subclass method.")
 
-    def write(self, path=None):
+    def write_table(self, path, overwrite=False):
         """Write out the ADX table.
 
         Parameter
         ---------
-        path: str, optional
+        path: str
            The output file path.
         """
-        if path is None:
-            path = self.path
-        if self.write:
-            self._write(path)
-
-    def _write(self, path):
         raise NotImplementedError("Defined in the subclass method.")
 
-    def close(self):
+    def close_table(self):
         """close ADXTable object
         """
-        del self.data
+        del self.table
+
+    def quary_rows(self, column_name, value, condition_funcs):
+        return condition_funcs(self.table, column_name, value)
