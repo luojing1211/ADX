@@ -67,7 +67,7 @@ class DataDirectory:
         for item in self.all_items:
             if not os.path.isdir(item):
                 item_ext = os.path.splitext(item)[1].replace('.', '')
-                if item_ext in ext_category.keys():
+                if item_ext in self.ext_category.keys():
                     self.ext_category[item_ext].append(item)
                 else:
                     self.ext_category[item_ext] = [item,]
