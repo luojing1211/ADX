@@ -4,7 +4,7 @@
 import os
 class TypeFilterBase(object):
     """TypeFilter class for defining file filters for parsing.
-   
+
     Attributes
     ----------
     _targets : list
@@ -27,20 +27,20 @@ class TypeFilterBase(object):
     -----
     The complexity of a TypeFilter object implementation is left
     completely up to the user. The only requirement that should be
-    adhered to is specified in `run()`'s docstring. 
-    """ 
-    
+    adhered to is specified in `run()`'s docstring.
+    """
+
     def __init__(self, name, tabletype):
-        self.targets = [] 
+        self.targets = []
         self._name = str(name)
         self._tabletype = str(tabletype)
-    
+
     def __call__(self, *args, **kwargs):
         """Execute `self._run()` with the provided arguments to filter
         targets according to user-defined logic.
         """
         return self._run(*args, **kwargs)
-    
+
     @property
     def tabletype(self):
         return self._tabletype
@@ -53,19 +53,19 @@ class TypeFilterBase(object):
     def targets(self):
         """Internal list of targets."""
         return self._targets
-    
+
     @targets.setter
     def targets(self, targetList):
         """Set internal target list"""
         self._targets = targetList
-    
+
     def add_target(self, target):
         """Add new target file to internal targets list
         """
         if target not in self.targets:
             self._targets.append(target)
         else:
-            print "Skipping duplicate target: {}".format(target)
+            print("Skipping duplicate target: {}".format(target))
 
     def _run(self, *args, **kwargs):
         """Apply user-defined logic to determine which of the provided
@@ -82,9 +82,9 @@ class TypeFilterBase(object):
 
 class ExtFilter(TypeFilterBase):
     """extension filter
-    
+
     Filter targets by file extension
-    
+
     Parameters
     ----------
     ext : str or list
@@ -93,7 +93,7 @@ class ExtFilter(TypeFilterBase):
         strings containing multile file extenstions to be filtered.
     name : str, optional
         name of ExtFilter implementation, defaults to "ExtFilter"
-    """ 
+    """
 
     def __init__(self, ext, name='ExtFilter'):
         super(ExtFilter, self).__init__(name, name)
@@ -106,7 +106,7 @@ class ExtFilter(TypeFilterBase):
 
     def _run(self, candTargets):
         """filter candidate target files
-        
+
         Parameters
         ----------
         candTargets : list
@@ -118,16 +118,15 @@ class ExtFilter(TypeFilterBase):
             tuple of lists containing the targets filtered
             and the leftover unfiltered targets.
         """
-        
-        cands = [] 
+
+        cands = []
         for cand in candTargets:
             for e in self.ext:
                 if cand.endswith(e):
-                    self.add_target(cand) 
+                    self.add_target(cand)
                     break
             else:
                 cands.append(cand)
-                 
+
         result = (self.targets, cands)
         return result
-
