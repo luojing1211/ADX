@@ -64,8 +64,10 @@ class DataDirectory:
         self.subdirs = []
         # have all subdirectory
         for item in self.all_items:
-            if (os.path.isdir(item) and
-                os.path.basename(item) != os.path.basename(self.log_dir)):
+            if not os.path.isdir(item):
+                continue
+            else:
+                if os.path.basename(item) != os.path.basename(self.log_dir):
                 self.subdirs.append(item)
         # catgory target exts
         # self.catelog = self.category_items()
