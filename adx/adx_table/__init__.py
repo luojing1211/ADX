@@ -1,3 +1,3 @@
-from .json_adx_table import JsonAdx
-from .sql_adx_table import SqliteAdx
-from .astrpy_adx_table import AstropyAdx
+# from .json_adx_table import JsonAdxTable
+# from .sqlite_adx_table import SqliteAdxTable
+from .astropy_adx_table import AstropyAdxTable

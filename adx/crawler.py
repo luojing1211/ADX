@@ -5,6 +5,8 @@
 
 """
 
+from .adx_directory import DataDirectory
+from .table import *
 
 
 class Crawler:
@@ -30,21 +32,15 @@ class Crawler:
         Crawler only parses the item types that have the `Parser` object
         provided.
     """
-    def __init__(self, dir_name, parsers, log_file=None):
-        self.root_dir = DirProcessor(dir_name, log_file=None)
-        self.parsers = parsers
+    def __init__(self, root_dir):
+        self.root_dir = root_dir
 
-    @property
-    def ext_map(self):
-        ext_map = {}
-        for p in self.parsers:
-            for e in p.extensions:
-                if e not in ext_map.keys():
-                    ext_map[e] = [p,]
-                else:
-                    ext_map[e].append(p)
-        return ext_map
-
-    def walk(self):
-        # use DirProcessor['directory'] as linker to the next level.
-        pass
+    def dfs(self):
+        visited, stack = set(), [self.root_dir]
+        while stack:
+            cur = stack.pop()
+            if cur not in visited:
+                visited.add(cur)
+                cur_info = DataDirectory(cur)
+                stack.extend(set(cur_info.next) - visited)
+        return visited

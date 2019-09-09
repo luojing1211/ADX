@@ -6,7 +6,7 @@ from astropy import log
 from astropy.time import Time
 from astropy.utils import lazyproperty
 
-from .table import *
+from .adx_table import *
 
 
 def read_config(config_file):
@@ -15,10 +15,10 @@ def read_config(config_file):
     return json.load(cf)
 
 
-def load_table(table_path, table_type=AstropyTable):
+def load_table(table_path, table_type):
     pass
 
-def init_table(table_type, table_template, table_type=AstropyAdxTable):
+def init_table(table_template, table_type):
     table = table_type()
     return table.init_table(table_template)
 
@@ -43,35 +43,32 @@ class DataDirectory:
        Right now it only use .csv file as the table file. In the future it can
        be expend to other types.
     """
-    def __init__(self, dir_path, table_file_exts='.csv',
-                 table_type=AstropyTable):
+    def __init__(self, dir_path, table_file_ext='.csv',
+                 table_type=AstropyAdxTable, config_file=None):
         self.path = os.path.abspath(dir_path)
         self.parent = os.path.basename(self.path)
         self.log_dir = os.path.join(self.path, "adx_log")
-        self.adx_config = os.path.join(self.log_dir, "config")
+        if config_file is None:
+            # use default config
+            self.adx_config = os.path.join(self.log_dir, "config")
+        else:
+            self.adx_config = config_file
         self.table_ext = table_file_ext
         self.isadx = self.validate()
         self.master_table_path = os.path.join(self.log_dir, 'master' +
                                               self.table_ext)
 
-        if not self.isadx:
-            self.config = None
-            self.master_table = None
-            self.log_tables = []
-        else:
-            self.config = read_config(self.adx_config)
-            self.master_table = load_table(self.master_table_path,
-                                           self.table_ext)
-            self.log_tables = [tf for tf in os.listdir(self.log_dir) if
-                               (tf.endswith(self.table_ext) and not
-                                tf.startswith('master'))]
+        self.config = None
+        self.master_table = None
+        self.log_tables = []
         self.subdirs = []
         # have all subdirectory
         for item in self.all_items:
-            if os.path.isdir(item) and item != os.basname(self.log_dir):
+            if (os.path.isdir(item) and
+                os.path.basename(item) != os.path.basename(self.log_dir)):
                 self.subdirs.append(item)
         # catgory target exts
-        self.catelog = self.category_items()
+        # self.catelog = self.category_items()
 
     def validate(self):
         """Check if this directory an adx logged data directory.
@@ -81,6 +78,14 @@ class DataDirectory:
             return True
         else:
             return False
+
+    def setup(self):
+        self.config = read_config(self.adx_config)
+        self.master_table = load_table(self.master_table_path,
+                                       self.table_ext)
+        self.log_tables = [tf for tf in os.listdir(self.log_dir) if
+                           (tf.endswith(self.table_ext) and not
+                            tf.startswith('master'))]
 
     @property
     def target_exts(self):
@@ -92,8 +97,12 @@ class DataDirectory:
 
     @property
     def directory_modify_time(self):
-    """Get the directory's newest modify time"""
+        """Get the directory's newest modify time"""
         return os.path.getmtime(self.path)
+
+    @property
+    def next(self):
+        return self.subdirs
 
     def get_parse_info(self, ext_name):
         try:
@@ -106,23 +115,20 @@ class DataDirectory:
         categories = {}
         for ext in self.target_exts:
             category[ext] = []
-        for item is self.all_items:
+        for item in self.all_items:
             item_ext = os.path.splitext(item).replace('.', '')
             if item_ext in categories.keys():
                 categories[item_ext] += item
         return categories
 
     def get_ext_table(self, ext):
-        
+        pass
 
     def load_ext_table(self, ext):
-        # search
-        ext_names = self.master_table['ext_names']
-        np.where
-
+        pass
 
     def mt_diff(self, ext):
-
+        pass
 
 #
 #     def get_item_diff(self):

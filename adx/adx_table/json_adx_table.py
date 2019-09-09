@@ -1,11 +1,11 @@
 """json_adx.py
 simple json ADXTable implementation
 """
-from .base import AdxTableBase
+from .base import TableWrapper
 import json
 import os
 
-class JsonAdxTable(AdxTableBase):
+class JsonAdxTable(TableWrapper):
     """Simple Json table
     """
     def __init__(self, table_path, write=False):
