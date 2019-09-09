@@ -34,6 +34,9 @@ class Crawler:
     def __init__(self, root_dir):
         self.root_dir = root_dir
 
+    def walk(self, method='dfs'):
+        return getattr(self, method)()
+
     def dfs(self):
         visited, stack = set(), [self.root_dir]
         result = []
