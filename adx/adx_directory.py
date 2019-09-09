@@ -68,9 +68,9 @@ class DataDirectory:
             if not os.path.isdir(item):
                 item_ext = os.path.splitext(item)[1].replace('.', '')
                 if item_ext in ext_category.keys():
-                    ext_category[item_ext] += item
+                    self.ext_category[item_ext].append(item)
                 else:
-                    ext_category[item_ext] = [item,]
+                    self.ext_category[item_ext] = [item,]
             else:
                 if os.path.basename(item) != os.path.basename(self.log_dir):
                     self.subdirs.append(item)
