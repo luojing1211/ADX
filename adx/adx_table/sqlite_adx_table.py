@@ -2,11 +2,11 @@
 sqlite3 ADXTable implementation
 """
 
-from .base import AdxTableBase
+from .base import TableWrapper
 import sqlite as sql
 import os
 
-class SqliteAdxTable(AdxTableBase):
+class SqliteAdxTable(TableWrapper):
     """SQLite3 DB handler
 
     basic implementation of an ADX Table using sqlite3 as a

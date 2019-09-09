@@ -79,5 +79,7 @@ class TableWrapper(object):
         """
         del self.table
 
-    def quary_rows(self, column_name, value, condition_funcs):
-        return condition_funcs(self.table, column_name, value)
+    def get_entry(self, condition):
+        return NotImplementedError("Defined in the subclass method.")
+
+    # def __add__(self, other_table):
