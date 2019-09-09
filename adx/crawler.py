@@ -6,7 +6,6 @@
 """
 
 from .adx_directory import DataDirectory
-from .table import *
 
 
 class Crawler:
