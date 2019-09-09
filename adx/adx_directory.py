@@ -68,7 +68,7 @@ class DataDirectory:
                 continue
             else:
                 if os.path.basename(item) != os.path.basename(self.log_dir):
-                self.subdirs.append(item)
+                    self.subdirs.append(item)
         # catgory target exts
         # self.catelog = self.category_items()
 
