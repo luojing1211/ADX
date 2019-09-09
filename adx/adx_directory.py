@@ -62,15 +62,18 @@ class DataDirectory:
         self.master_table = None
         self.log_tables = []
         self.subdirs = []
+        self.ext_category = {}
         # have all subdirectory
         for item in self.all_items:
             if not os.path.isdir(item):
-                continue
+                item_ext = os.path.splitext(item).replace('.', '')
+                if item_ext in ext_category.keys():
+                    ext_category[item_ext] += item
+                else:
+                    ext_category[item_ext] = [item,]
             else:
                 if os.path.basename(item) != os.path.basename(self.log_dir):
                     self.subdirs.append(item)
-        # catgory target exts
-        # self.catelog = self.category_items()
 
     def validate(self):
         """Check if this directory an adx logged data directory.
@@ -111,17 +114,6 @@ class DataDirectory:
             return self.config[ext_name]
         except KeyError:
             raise ValueError("{} is not in the target extension list.")
-
-    def category_items(self):
-        # This function only category items by extension.
-        categories = {}
-        for ext in self.target_exts:
-            category[ext] = []
-        for item in self.all_items:
-            item_ext = os.path.splitext(item).replace('.', '')
-            if item_ext in categories.keys():
-                categories[item_ext] += item
-        return categories
 
     def get_ext_table(self, ext):
         pass
