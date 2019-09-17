@@ -38,6 +38,11 @@ class DataDirectory:
     table_type: `ADX table type` class
         Date base table type. Default is the astropy table.
 
+    Attribute
+    ---------
+    files: dict
+        All of the files in the directory and categoried by their extensions.  
+
     Note
     ----
        Right now it only use .csv file as the table file. In the future it can
@@ -62,15 +67,15 @@ class DataDirectory:
         self.master_table = None
         self.log_tables = []
         self.subdirs = []
-        self.ext_category = {}
+        self.files = {}
         # have all subdirectory
         for item in self.all_items:
             if not os.path.isdir(item):
                 item_ext = os.path.splitext(item)[1].replace('.', '')
                 if item_ext in self.ext_category.keys():
-                    self.ext_category[item_ext].append(item)
+                    self.files[item_ext].append(item)
                 else:
-                    self.ext_category[item_ext] = [item,]
+                    self.files[item_ext] = [item,]
             else:
                 if os.path.basename(item) != os.path.basename(self.log_dir):
                     self.subdirs.append(item)
