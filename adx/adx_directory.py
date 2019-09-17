@@ -41,7 +41,7 @@ class DataDirectory:
     Attribute
     ---------
     files: dict
-        All of the files in the directory and categoried by their extensions.  
+        All of the files in the directory and categoried by their extensions.
 
     Note
     ----
@@ -72,7 +72,7 @@ class DataDirectory:
         for item in self.all_items:
             if not os.path.isdir(item):
                 item_ext = os.path.splitext(item)[1].replace('.', '')
-                if item_ext in self.ext_category.keys():
+                if item_ext in self.files.keys():
                     self.files[item_ext].append(item)
                 else:
                     self.files[item_ext] = [item,]
