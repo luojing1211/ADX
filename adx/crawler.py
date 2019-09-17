@@ -39,12 +39,12 @@ class Crawler:
 
     def dfs(self):
         visited, stack = set(), [self.root_dir]
-        result = []
+        result = {}
         while stack:
             cur = stack.pop()
             if cur not in visited:
                 visited.add(cur)
                 cur_info = DataDirectory(cur)
-                result.append((cur, cur_info))
+                result.update({cur: cur_info})
                 stack.extend(set(cur_info.next) - visited)
         return result
